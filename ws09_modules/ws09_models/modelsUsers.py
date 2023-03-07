@@ -1,39 +1,46 @@
 from .modelsBase import Base, sess
 from sqlalchemy.orm import sessionmaker, Session, relationship
 from sqlalchemy import Column, Integer, String, Text, Float, DateTime, ForeignKey, \
-    Date
+    Date, Boolean
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from datetime import datetime
 from flask_login import UserMixin
-from ws09_config import ConfigDev, ConfigProd, ConfigLocal
+# from ws09_config import ConfigDev, ConfigProd, ConfigLocal
+from .config import config
 import os
 
-if os.environ.get('CONFIG_TYPE')=='local':
-    config = ConfigLocal()
-    # print('* modelsUsers: Development - Local')
-elif os.environ.get('CONFIG_TYPE')=='dev':
-    config = ConfigDev()
-    # print('* models: Development')
-elif os.environ.get('CONFIG_TYPE')=='prod':
-    config = ConfigProd()
-    # print('* modelsMain: Configured for Production')
-# if os.uname()[1] == 'Nicks-Mac-mini.lan' or os.uname()[1] == 'NICKSURFACEPRO4':
+# if os.environ.get('CONFIG_TYPE')=='local':
 #     config = ConfigLocal()
-# elif 'dev' in os.uname()[1]:
+#     # print('* modelsUsers: Development - Local')
+# elif os.environ.get('CONFIG_TYPE')=='dev':
 #     config = ConfigDev()
-# elif 'prod' in os.uname()[1] or os.uname()[1] == 'speedy100':
+#     # print('* models: Development')
+# elif os.environ.get('CONFIG_TYPE')=='prod':
 #     config = ConfigProd()
-    
+
+def default_username(context):
+    return context.get_current_parameters()['email'].split('@')[0]
+
+
 
 class Users(Base, UserMixin):
     __tablename__ = 'users'
     id = Column(Integer, primary_key = True)
     email = Column(Text, unique = True, nullable = False)
     password = Column(Text, nullable = False)
+    username = Column(Text, default=default_username)
     lat = Column(Float(precision=4, decimal_return_scale=None))
     lon = Column(Float(precision=4, decimal_return_scale=None))
     share = Column(Text)
     notes = Column(Text)
+    post_blog_permission = Column(Boolean, default=True)
+    post_news_permission = Column(Boolean, default=False)
+    comment_blog_permission = Column(Boolean, default=True)
+    comment_news_permission = Column(Boolean, default=True)
+    admin_blog_permission = Column(Boolean, default=False)
+    admin_news_permission = Column(Boolean, default=False)
+    guest_account = Column(Boolean, default=False)
+    guest_account_mirror = Column(Boolean, default=False)
     time_stamp_utc = Column(DateTime, nullable = False, default = datetime.utcnow)
     oura_token_id = relationship("Oura_token", backref="oura_token_id", lazy=True)
     oura_sleep = relationship('Oura_sleep_descriptions', backref='oura_sleep', lazy=True)
@@ -43,6 +50,7 @@ class Users(Base, UserMixin):
     community_comments = relationship('communitycomments', backref='community_comments', lazy=True)
     news_posts = relationship('newsposts', backref='news_posts', lazy=True)
     news_comments = relationship('newscomments', backref='news_comments', lazy=True)
+    print("guest_account: ", guest_account, type(guest_account))
 
 
     def get_reset_token(self, expires_sec=1800):
@@ -59,18 +67,20 @@ class Users(Base, UserMixin):
         return sess.query(Users).get(user_id)
 
     def __repr__(self):
-        return f'Users(id: {self.id}, email: {self.email}, share: {self.share})'
+        return f'Users(id: {self.id}, email: {self.email}, share: {self.share},' \
+        f'post_news_permission: {self.post_news_permission})'
 
 
 class communityposts(Base):
     __tablename__ = 'communityposts'
     id = Column(Integer, primary_key = True)
     user_id = Column(Integer, ForeignKey("users.id"))
+    blog_id_name_string = Column(Text)
     title = Column(Text)
     description = Column(Text)
     date_published = Column(DateTime, nullable=False, default=datetime.now)
     edited = Column(Text)
-    word_doc_filename = Column(Text)
+    post_html_filename = Column(Text)
     notes = Column(Text)
     time_stamp_utc = Column(DateTime, nullable = False, default = datetime.utcnow)
     comments = relationship('communitycomments', backref='comments', lazy=True)

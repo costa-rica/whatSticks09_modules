@@ -1,42 +1,39 @@
-from .modelsMain import login_manager, sess, engine, Base, \
+from .modelsMain import login_manager, sess, engine, text, Base, \
     Users, communityposts, communitycomments, newsposts, newscomments, \
     User_notes, Locations, Weather_history, \
     Oura_token, Oura_sleep_descriptions, User_location_day, \
     Apple_health_steps, Apple_health_export
 
-from ws09_config import ConfigDev, ConfigProd, ConfigLocal
 import os
 
 
-if os.environ.get('CONFIG_TYPE')=='local':
-    config = ConfigLocal()
-elif os.environ.get('CONFIG_TYPE')=='dev':
-    config = ConfigDev()
-elif os.environ.get('CONFIG_TYPE')=='prod':
-    config = ConfigProd()
+############################################################################
+## This is one of the first files to execute so make dirs here
 
-########################################################
-## Check/make key directories here becuase
-## This is one of the first files to fire
-if not os.path.exists(os.path.join(config.PROJ_DB_PATH)):
-    os.makedirs(os.path.join(config.PROJ_DB_PATH))
+if not os.path.exists(os.environ.get('DB_ROOT')):
+    os.makedirs(os.environ.get('DB_ROOT'))
 
-# if not os.path.exists(os.path.join(config.DB_DOWNLOADS)):
-#     os.makedirs(os.path.join(config.DB_DOWNLOADS))
+if not os.path.exists(os.path.join(os.environ.get('DB_ROOT'),"df_files")):
+    os.makedirs(os.path.join(os.environ.get('DB_ROOT'),"df_files"))
 
-if not os.path.exists(os.path.join(config.DF_FILES_DIR)):
-    os.makedirs(os.path.join(config.DF_FILES_DIR))
+if not os.path.exists(os.path.join(os.environ.get('DB_ROOT'),"apple_health")):
+    os.makedirs(os.path.join(os.environ.get('DB_ROOT'),"apple_health"))
 
-if not os.path.exists(os.path.join(config.WORD_DOC_DIR)):
-    os.makedirs(os.path.join(config.WORD_DOC_DIR))
+#######################################################################################
+## NOTE: Unsure if needed since html files will be stored in templates directory ##
+if not os.path.exists(os.path.join(os.environ.get('DB_ROOT'),"blog_html_files")):
+    os.makedirs(os.path.join(os.environ.get('DB_ROOT'),"blog_html_files"))
 
-if not os.path.exists(os.path.join(config.APPLE_HEALTH_DIR)):
-    os.makedirs(os.path.join(config.APPLE_HEALTH_DIR))
+if not os.path.exists(os.path.join(os.environ.get('DB_ROOT'),"news_html_files")):
+    os.makedirs(os.path.join(os.environ.get('DB_ROOT'),"news_html_files"))
+
+######################################################################################
+
 ##########################################################
 
 print(f'- in ../ws09_modules/ws09_models/__init__.py -')
 #Build db
-if os.path.exists(os.path.join(config.PROJ_DB_PATH,'ws09.db')):
+if os.path.exists(os.path.join(os.environ.get('DB_ROOT'),os.environ.get('DB_NAME'))):
     print(f'db already exists.')
 else:
     Base.metadata.create_all(engine)
