@@ -31,10 +31,9 @@ if not os.path.exists(os.path.join(os.environ.get('DB_ROOT'),"news_html_files"))
 
 ##########################################################
 
-print(f'- in ../ws09_modules/ws09_models/__init__.py -')
 #Build db
 if os.path.exists(os.path.join(os.environ.get('DB_ROOT'),os.environ.get('DB_NAME'))):
-    print(f'db already exists.')
+    print(f"db already exists: {os.path.join(os.environ.get('DB_ROOT'),os.environ.get('DB_NAME'))}")
 else:
     Base.metadata.create_all(engine)
-    print(f'NEW db created.')
+    print(f"NEW db created: {os.path.join(os.environ.get('DB_ROOT'),os.environ.get('DB_NAME'))}")

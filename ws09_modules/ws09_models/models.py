@@ -9,5 +9,3 @@ from flask_login import UserMixin, LoginManager
 import json
 import os
 
-
-print('******* -- ws09_models models.py --')
