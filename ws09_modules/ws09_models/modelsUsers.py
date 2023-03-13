@@ -29,6 +29,7 @@ class Users(Base, UserMixin):
     comment_news_permission = Column(Boolean, default=True)
     admin_blog_permission = Column(Boolean, default=False)
     admin_news_permission = Column(Boolean, default=False)
+    admin_users_permission = Column(Boolean, default=False)
     guest_account = Column(Boolean, default=False)
     guest_account_mirror = Column(Boolean, default=False)
     time_stamp_utc = Column(DateTime, nullable = False, default = datetime.utcnow)
